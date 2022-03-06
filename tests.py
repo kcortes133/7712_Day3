@@ -1,45 +1,48 @@
 # Author: Katherina Cortes
 # Date: Feburary 28, 2022
-# Purpose:
+# Purpose: unit tests for all methods
 
 import unittest
 import winreg
 
 import graphCreation, graphTraversal, dataExploration
 
+class GraphCreation(unittest.TestCase):
+    def testGCreation(self):
+        reads = ['theca', 'ecati', 'atisf', 'isfat']
+        graph, s = graphCreation.makeDeBruijnGraph(reads, 3)
+        self.assertEqual(graph, {'the': {'eca': 'theca'}, 'eca': {'ati': 'ecati'}, 'ati': {'isf': 'atisf'}, 'isf': {'fat': 'isfat'}, 'fat':{}})
+
 
 class TestTraversal(unittest.TestCase):
     def testStartNodes(self):
-        g1 = {'A': {'B': 'AB', 'C': 'AC'}, 'B': {'D': 'BD'}, 'E': {'G': 'EG'}, 'D': {}, 'C': {}, 'G': {}}
-        startNodes = graphTraversal.getStartNodes(g1)
+        reads = ['AB', 'AC', 'BD', 'EG']
+        g, startNodes = graphCreation.makeDeBruijnGraph(reads, 1)
         self.assertEqual(startNodes, ['A', 'E'])
 
     def testDFS(self):
         g = {'A': {'B': 'AB', 'C': 'AC'}, 'B': {'D': 'BD', 'G': 'BG'}, 'D': {'C': 'DC'}, 'C': {}, 'G': {}}
-        startNs = graphTraversal.getStartNodes(g)
-        e = list(g.keys())
-        e.remove('A')
-        startNs.remove('A')
-        contigs = graphTraversal.depthFirstSearch(g, 'A', [], e, 'A', startNs)
+        startNs = ['A']
+        contigs = graphTraversal.graphTraverse(g, startNs)
         self.assertEqual(contigs, ['ABDC', 'ABG', 'AC'])
 
     def testDFSDisconnected(self):
         g1 = {'A': {'B': 'AB', 'C': 'AC'}, 'B': {'D': 'BD'}, 'E': {'G': 'EG'}, 'D': {}, 'C': {}, 'G': {}}
-        startNs = graphTraversal.getStartNodes(g1)
-        e = list(g1.keys())
-        e.remove('A')
-        startNs.remove('A')
-        contigs = graphTraversal.depthFirstSearch(g1, 'A', [], e, 'A', startNs)
-        self.assertEqual(contigs, ['EG', 'ABD', 'AC'])
+        startNs = ['A', 'E']
+        contigs = graphTraversal.graphTraverse(g1, startNs)
+        self.assertEqual(contigs, ['ABD', 'AC', 'EG'])
 
     def testDFSMultiStarts(self):
         g = {'A': {'B': 'AB', 'C': 'AC'}, 'B': {'D': 'BD', 'G': 'BG'}, 'D': {'C': 'DC'}, 'C': {}, 'G': {}, 'F':{'B':'FB'}}
-        startNs = graphTraversal.getStartNodes(g)
-        e = list(g.keys())
-        e.remove('A')
-        startNs.remove('A')
-        contigs = graphTraversal.depthFirstSearch(g, 'A', [], e, 'A', startNs)
-        self.assertEqual(contigs, ['FBDC', 'FBG', 'ABDC', 'ABG', 'AC'])
+        startNs = ['A', 'F']
+        contigs = graphTraversal.graphTraverse(g, startNs)
+        self.assertEqual(contigs, ['ABDC', 'ABG', 'AC', 'FBDC', 'FBG'])
+
+    def testNoContLoop(self):
+        g = {'A': {'B': 'AB'}, 'B': {'D': 'BD', 'G': 'BG'}, 'D': {'C': 'DC'}, 'C': {'B':'CB'}, 'G': {}}
+        startNs = ['A']
+        contigs = graphTraversal.graphTraverse(g, startNs)
+        self.assertEqual(contigs, ['ABDCBG'])
 
 
 if __name__ == '__main__':

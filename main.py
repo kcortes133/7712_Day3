@@ -1,8 +1,12 @@
 # Author: Katherina Cortes
 # Date: Feburary 25, 2022
-# Purpose:
+# Purpose: String reconstruction from next generation sequencing reads and query sequence searching
 
 import argparse, random, time
+import numpy as np
+
+import matplotlib.pyplot as plt
+
 import graphCreation, graphTraversal, dataExploration
 
 
@@ -11,25 +15,18 @@ parser.add_argument('kmer size')
 
 
 def main():
+    # get reads from file and determine spread
     readsFile = 'READS.fasta'
-    dataExploration.getReads(readsFile)
+    reads = dataExploration.getReads(readsFile)
+    chroms = dataExploration.getReadsChrom(readsFile)
 
-    g1 = {'A':{'B': 'AB', 'C':'AC'}, 'B': {'D': 'BD'}, 'E':{'G': 'EG'}, 'D':{}, 'C':{}, 'G':{}}
-    g = {'A':{'B': 'AB', 'C':'AC'}, 'B': {'D': 'BD', 'G': 'BG'}, 'D':{'C': 'DC'}, 'C':{}, 'G': {}}
-    g1 = {'A':{'B': 'AB', 'C':'AC'}, 'B': {'D': 'BD', 'G': 'BG'}, 'D':{'C': 'DC'}, 'C':{}, 'G': {}, 'F':{'B': 'FB'}}
+    # make graph
+    g, startNs = graphCreation.makeDeBruijnGraph(reads)
 
-    startNs = graphTraversal.getStartNodes(g)
-    print(startNs)
+    contigs = graphTraversal.graphTraverse(g,startNs)
 
-    e = list(g.keys())
-    e.remove('A')
-    startNs.remove('A')
-    contigs = graphTraversal.depthFirstSearch(g, 'A', [], e, 'A', startNs)
     print(contigs)
-
-    contigs1 = graphTraversal.depthFirstSearch(g1, 'A', [], e, 'A', startNs)
-    print(contigs1)
-
+    print(len(contigs))
 
     return
 
