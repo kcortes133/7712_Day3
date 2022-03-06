@@ -72,9 +72,17 @@ $ python .\main.py READS.fasta QUERY.fasta --kmerSize=10
 ## Output
 General Info about reads, start nodes and contigs
 - Number of reads on  2S43D 62278
+![chrom 1 read lengths](https://user-images.githubusercontent.com/22487858/156932731-e288538a-9d61-4ebc-b478-5e124324bc0e.png)
 
 - Number of start nodes:  48052
 - Number of contigs 2S43D 58199
+![chrom 1 contig lengs](https://user-images.githubusercontent.com/22487858/156932740-017ca5ba-a813-4899-9f48-e0239ca51c43.png)
+
 - Number of reads on  2G5Z3 62242
+![chrom2 read lengths](https://user-images.githubusercontent.com/22487858/156932749-3f5a0a8b-9699-46b3-a75f-e9221a390edd.png)
+
 - Number of start nodes:  47905
 - Number of contigs 2G5Z3 58180
+![chrom 2 contig lengths](https://user-images.githubusercontent.com/22487858/156932755-295e6669-66e2-45ee-bea7-8b8da10a2b82.png)
+
+
