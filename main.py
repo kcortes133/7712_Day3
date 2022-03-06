@@ -10,23 +10,26 @@ import matplotlib.pyplot as plt
 import graphCreation, graphTraversal, dataExploration
 
 
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('kmer size')
+parser = argparse.ArgumentParser(description='Reconstruct sequence from reads and query for substring')
+parser.add_argument('readsFile', metavar='reads', type=str, default='READS.fasta', help='input file of reads')
+parser.add_argument('queryFile', metavar='query', type=str, default='QUERY.fasta', help='input file containing'
+                                                                                        'the query string')
+parser.add_argument('--kmerSize', metavar='kmer', type=int, default=10, help='length of node string')
 
-
+args = parser.parse_args()
 def main():
     # get reads from file and determine spread
-    readsFile = 'READS.fasta'
-    reads = dataExploration.getReads(readsFile)
-    chroms = dataExploration.getReadsChrom(readsFile)
+    chroms = dataExploration.getReadsChrom(args.readsFile)
 
-    # make graph
-    g, startNs = graphCreation.makeDeBruijnGraph(reads)
+    # get reads, make graph, get contigs for all chromosomes
+    for c in chroms:
+        print('Number of reads on ', c, len(chroms[c]))
+        g, startNs = graphCreation.makeDeBruijnGraph(chroms[c])
 
-    contigs = graphTraversal.graphTraverse(g,startNs)
+        print('Number of start nodes: ', len(startNs))
+        contigs = graphTraversal.graphTraverse(g,startNs)
+        print('Number of contigs', c, len(contigs))
 
-    print(contigs)
-    print(len(contigs))
 
     return
 

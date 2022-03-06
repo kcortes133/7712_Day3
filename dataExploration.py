@@ -1,6 +1,6 @@
 # Author: Katherina Cortes
 # Date: Feburary 25, 2022
-# Purpose: look at distribution of read lengths
+# Purpose: read in files
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +28,7 @@ def getReadLens(readF):
 
     return
 
-def getQuery():
+def getQuery(queryF):
 
     return
 
@@ -51,11 +51,11 @@ def getReadsChrom(readF):
     with open(readF, 'r') as f:
         lines = f.readlines()
 
-    c = 0
     for line in lines:
         line = line.strip()
         if line.startswith('>'):
-            info = line.split(':')
+
+            info = line.strip('>').split(':')
             chrom = info[0]
         else:
             if chrom in reads:
@@ -63,4 +63,10 @@ def getReadsChrom(readF):
             else:
                 reads[chrom] = [line]
     return reads
+
+
+def plotHist(strings, title):
+    plt.hist(strings, rwidth=0.9)
+    plt.title(title)
+    plt.show()
 

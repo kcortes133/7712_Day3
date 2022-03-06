@@ -11,11 +11,7 @@ import math
 def makeDeBruijnGraph(kmers,fixLen=10):
     graph = {}
     startNs = []
-    count = 0
     for m in kmers:
-        if count%1000 == 0  and count>1:
-            print(count, len(startNs))
-        count+=1
         edgeTemp = m
 
         node1 = m[:fixLen]
@@ -41,8 +37,3 @@ def readsToKmers(reads, kSize):
         parts = [r[i:i+kSize] for i in range(0,len(r),kSize)]
         newReads.extend(parts)
     return newReads
-
-def splitStr(s, num):
-    r = len(s)%num
-    num = int(len(s)/num)
-

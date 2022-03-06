@@ -23,3 +23,9 @@
    - 
 
 ## Output
+Number of reads on  2S43D 62278
+Number of start nodes:  48052
+Number of contigs 2S43D 58199
+Number of reads on  2G5Z3 62242
+Number of start nodes:  47905
+Number of contigs 2G5Z3 58180

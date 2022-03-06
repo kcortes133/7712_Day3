@@ -17,19 +17,13 @@ def depthFirstSearch(graph, currNode, contigs, explored, currContig):
     # start nodes not explored
     # no more edges
     if len(graph[currNode]) == 0:
-        #if startNs:
-        #    newStart = startNs.pop()
-        #    explored = []
-        #    depthFirstSearch(graph, newStart, contigs, explored, newStart, startNs)
         contigs.append(currContig)
         return contigs
 
     # get next nodes
     for neighbor in graph[currNode]:
         edge = graph[currNode][neighbor]
-        fixLen = int(math.ceil(len(edge)/2))
         # append next part of contig
-        #//TODO make sure this is correct and getting all of edge after currNode
         newContig = currContig + edge[len(currNode):]
 
         # make sure edge hasnt been explored
@@ -48,10 +42,6 @@ def getStartNodes(graph):
     for node in graph:
         if count%1000 == 0:
             print(count)
-        exists = False
-        #for node2 in graph:
-        #    if node in graph[node2]:
-        #        exists = True
         exists = any(node in d.values() for d in graph.values())
         if not exists:
             startNs.append(node)
@@ -60,7 +50,6 @@ def getStartNodes(graph):
 
 
 def getLeaves(graph):
-
     ls = []
     for node in graph:
         if not graph[node]:
@@ -74,11 +63,8 @@ def getLeaves(graph):
 # @param graph: dictionary of reads
 # @returns contigs: list of contigs generated from graph traversal
 def graphTraverse(graph,startNs):
-    #startNs = getStartNodes(graph)
-    #start = startNs.pop(0)
     allContigs = []
     for start in startNs:
-        print(start)
         contigs = depthFirstSearch(graph, start, [], [], start)
         allContigs.extend(contigs)
 
