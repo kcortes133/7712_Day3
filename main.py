@@ -24,10 +24,12 @@ def main():
     # get reads, make graph, get contigs for all chromosomes
     for c in chroms:
         print('Number of reads on ', c, len(chroms[c]))
+        dataExploration.plotHist(chroms[c], c+ ' Read Lengths')
         g, startNs = graphCreation.makeDeBruijnGraph(chroms[c])
 
         print('Number of start nodes: ', len(startNs))
         contigs = graphTraversal.graphTraverse(g,startNs)
+        dataExploration.plotHist(contigs, c+ ' Contig Lengths')
         print('Number of contigs', c, len(contigs))
 
 
