@@ -5,3 +5,4 @@
 
 def searchQuery(query, contigs):
     return
+

@@ -3,9 +3,7 @@
 # Purpose: Make de bruijn graph with reads
 
 
-import math
-
-
+# make de bruijn graph nodes are of length fixLen and edges are the reads
 # @param kmers: list of reads
 # @returns graph: dictionary
 def makeDeBruijnGraph(kmers,fixLen=10):
@@ -29,11 +27,3 @@ def makeDeBruijnGraph(kmers,fixLen=10):
             graph[node2] = {}
 
     return graph, startNs
-
-
-def readsToKmers(reads, kSize):
-    newReads = []
-    for r in reads:
-        parts = [r[i:i+kSize] for i in range(0,len(r),kSize)]
-        newReads.extend(parts)
-    return newReads

@@ -1,4 +1,4 @@
-# Assembling the Genome
+# Reassembling the Genome
 
 ## Goal
 Assemble contigs from next-generation sequencing reads and return the largest contig that contains
@@ -18,7 +18,7 @@ while traversing the graph and returned as a library to search for the query thr
 - matplotlib.pyplot
 - numpy
 - math 
-- 
+
 ## Usage
 #### Python Usage
 ```python
@@ -36,10 +36,17 @@ def main():
    # get reads, make graph, get contigs for all chromosomes
    for c in chroms:
       print('Number of reads on ', c, len(chroms[c]))
+      
+      # Histogram of read lengths
+      dataExploration.plotHist(chroms[c], c+ ' Read Lengths')
+      
       g, startNs = graphCreation.makeDeBruijnGraph(chroms[c])
-
       print('Number of start nodes: ', len(startNs))
+      
       contigs = graphTraversal.graphTraverse(g,startNs)
+      
+      # Histogram of contig lengths created from graph traversal
+      dataExploration.plotHist(contigs, c+ ' Contig Lengths')
       print('Number of contigs', c, len(contigs))
 
    querySearch.searchQuery(query, contigs)
@@ -51,10 +58,10 @@ main()
 ```
 #### Command Line Usage
 ```commandline
-default
+default, specify reads and query input
 $ python .\main.py READS.fasta QUERY.fasta
 
-specify kmer length
+specify kmer length of nodes overlap
 $ python .\main.py READS.fasta QUERY.fasta --kmerSize=10
 
 

@@ -38,7 +38,7 @@ class TestTraversal(unittest.TestCase):
         contigs = graphTraversal.graphTraverse(g, startNs)
         self.assertEqual(contigs, ['ABDC', 'ABG', 'AC', 'FBDC', 'FBG'])
 
-    def testNoContLoop(self):
+    def testNoInfinLoop(self):
         g = {'A': {'B': 'AB'}, 'B': {'D': 'BD', 'G': 'BG'}, 'D': {'C': 'DC'}, 'C': {'B':'CB'}, 'G': {}}
         startNs = ['A']
         contigs = graphTraversal.graphTraverse(g, startNs)

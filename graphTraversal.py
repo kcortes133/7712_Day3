@@ -2,8 +2,6 @@
 # Date: March 3, 2022
 # Purpose: traverse through graph to get contigs
 
-import math
-
 
 # depth first search that searches all paths
 # @param graph: dictionary of graph of reads

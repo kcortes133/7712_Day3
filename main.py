@@ -17,7 +17,9 @@ parser.add_argument('queryFile', metavar='query', type=str, default='QUERY.fasta
 parser.add_argument('--kmerSize', metavar='kmer', type=int, default=10, help='length of node string')
 
 args = parser.parse_args()
+
 def main():
+    start = time.time()
     # get reads from file and determine spread
     chroms = dataExploration.getReadsChrom(args.readsFile)
 
@@ -32,7 +34,7 @@ def main():
         dataExploration.plotHist(contigs, c+ ' Contig Lengths')
         print('Number of contigs', c, len(contigs))
 
-
+    print(time.time() - start)
     return
 
 

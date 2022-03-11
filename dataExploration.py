@@ -4,6 +4,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 # get read lengths from input file
 # @params readF: input file name
@@ -19,6 +20,9 @@ def getReadLens(readF):
         if not line.startswith('>'):
             readLengths.append(len(line))
 
+    print(min(readLengths))
+    print(max(readLengths))
+    print(np.mean(readLengths))
     plt.hist(readLengths, rwidth=0.9)
     plt.title('Read Lengths')
     plt.show()
@@ -85,6 +89,9 @@ def plotHist(strings, title):
     slen = []
     for s in strings:
         slen.append(len(s))
+    print(min(slen))
+    print(max(slen))
+    print(np.mean(slen))
     plt.hist(slen, rwidth=0.9)
     plt.title(title)
     plt.show()
