@@ -11,9 +11,11 @@
 # @param currContig: current string contig being build
 # @param startNs: list of nodes to start traversal at, dont have input edges
 # @returns contigs: list of contigs made from graph
-def depthFirstSearch(graph, currNode, contigs, explored, currContig):
+def depthFirstSearch(graph, currNode, contigs, explored, currContig, c):
     # start nodes not explored
     # no more edges
+    c+=1
+    print(c)
     if len(graph[currNode]) == 0:
         contigs.append(currContig)
         return contigs
@@ -28,8 +30,9 @@ def depthFirstSearch(graph, currNode, contigs, explored, currContig):
         # ensures no infinite loops
         if edge not in explored:
             explored.append(edge)
-            depthFirstSearch(graph, neighbor, contigs, explored, newContig)
+            depthFirstSearch(graph, neighbor, contigs, explored, newContig,c)
     return contigs
+
 
 # get nodes with no input edges to start traversal at
 # @param graph: dictionary of de bruijn graph made from reads
@@ -63,7 +66,7 @@ def getLeaves(graph):
 def graphTraverse(graph,startNs):
     allContigs = []
     for start in startNs:
-        contigs = depthFirstSearch(graph, start, [], [], start)
+        contigs = depthFirstSearch(graph, start, [], [], start, 0)
         allContigs.extend(contigs)
 
     return allContigs

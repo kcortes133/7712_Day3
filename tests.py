@@ -13,6 +13,14 @@ class GraphCreation(unittest.TestCase):
         graph, s = graphCreation.makeDeBruijnGraph(reads, 3)
         self.assertEqual(graph, {'the': {'eca': 'theca'}, 'eca': {'ati': 'ecati'}, 'ati': {'isf': 'atisf'}, 'isf': {'fat': 'isfat'}, 'fat':{}})
 
+    def testGCreationKmers(self):
+        read = ['thecatisfat']
+        reads = graphCreation.makeKmers(read, 5)
+        print(reads)
+        graph, s = graphCreation.makeDeBruijnGraph(reads, 4)
+        print(graph)
+        self.assertEqual(graph, {'thec': {'heca': 'theca'}, 'heca': {'ecat': 'hecat'}, 'ecat': {'cati': 'ecati'}, 'cati': {'atis': 'catis'}, 'atis': {'tisf': 'atisf'}, 'tisf': {'isfa':
+ 'tisfa'}, 'isfa': {'sfat': 'isfat'}, 'sfat': {}})
 
 class TestTraversal(unittest.TestCase):
     def testStartNodes(self):
