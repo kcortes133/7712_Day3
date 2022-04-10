@@ -2,11 +2,13 @@
 # Date: April 2, 2022
 # Purpose:
 
-class Edges:
-    def __init__(self, label, prevNodes, nextNodes):
+class Edge:
+    def __init__(self, label, readID, start):
         self.label = label
-        self.prevNodes = prevNodes
-        self.nextNodes = nextNodes
+        self.prevNodes = {}
+        self.nextNodes = {}
+        self.readIDs = [(readID, start)]
+
 
     def getLabel(self):
         return self.label
@@ -16,3 +18,12 @@ class Edges:
 
     def getNewNodes(self):
         return self.nextNodes
+
+    def addPrev(self, node, edge):
+        self.prevNodes[node] = edge
+
+    def addNext(self, node, edge):
+        self.nextNodes[node] = edge
+
+    def addReadID(self, readID, start):
+        self.readIDs.append(readID, start)

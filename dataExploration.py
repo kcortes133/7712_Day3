@@ -28,9 +28,6 @@ def getReadLens(readF):
     plt.show()
 
     u, c = np.unique(readLengths, return_counts=True)
-    print(u)
-    print(c)
-
     return
 
 
@@ -38,8 +35,19 @@ def getReadLens(readF):
 # @params queryF: file name containing query string
 # @returns query: query string
 def getQuery(queryF):
+    queries = {}
 
-    return
+    with open(queryF, 'r') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith('>'):
+            queryID = line
+        else:
+            queries[queryID] = line
+
+    return queries
 
 
 # get reads from file
@@ -70,14 +78,38 @@ def getReadsChrom(readF):
     for line in lines:
         line = line.strip()
         if line.startswith('>'):
-
+            readID = line
             info = line.strip('>').split(':')
             chrom = info[0]
+
+
         else:
             if chrom in reads:
                 reads[chrom].append(line)
             else:
                 reads[chrom] = [line]
+    return reads
+
+
+def getReadsChromInfo(readF):
+    reads = {}
+
+    with open(readF, 'r') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith('>'):
+            readID = line
+            info = line.strip('>').split(':')
+            chrom = info[0]
+        else:
+            if chrom not in reads:
+                reads[chrom] = {}
+
+            if line not in reads[chrom]:
+                reads[chrom][line] = {}
+            reads[chrom][line] = readID
     return reads
 
 

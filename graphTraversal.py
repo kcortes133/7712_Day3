@@ -11,17 +11,23 @@
 # @param currContig: current string contig being build
 # @param startNs: list of nodes to start traversal at, dont have input edges
 # @returns contigs: list of contigs made from graph
-def depthFirstSearch(graph, currNode, contigs, explored, currContig, c):
+from collections import deque
+
+
+def depthFirstSearch(graph, currNode, contigs, explored, currContig):
     # start nodes not explored
     # no more edges
-    c+=1
-    print(c)
     if len(graph[currNode]) == 0:
         contigs.append(currContig)
         return contigs
 
     # get next nodes
+    if len(graph[currNode]) == 1:
+        print('exit here')
+        # TODO
+        # return current node and contig
     for neighbor in graph[currNode]:
+
         edge = graph[currNode][neighbor]
         # append next part of contig
         newContig = currContig + edge[len(currNode):]
@@ -30,8 +36,76 @@ def depthFirstSearch(graph, currNode, contigs, explored, currContig, c):
         # ensures no infinite loops
         if edge not in explored:
             explored.append(edge)
-            depthFirstSearch(graph, neighbor, contigs, explored, newContig,c)
+            depthFirstSearch(graph, neighbor, contigs, explored, newContig)
     return contigs
+
+
+# @param graph:
+# @param startN:
+# @param explored:
+# @param contigs:
+# @returns contigs:
+def dFSIter(graph, startN):
+    explored = {}
+    stack = {startN: startN.label}
+    contigs = []
+
+    while stack:
+        print('-----------')
+        currN, currContig = stack.popitem()
+
+        # get neighbors through Node class
+        for neighbor in graph[currN]:
+            edge = graph[currN][neighbor].label
+            if edge not in explored:
+                stack[neighbor] = currContig + edge[-1]
+                explored[edge] = True
+            # if current node is a leaf
+        if len(graph[currN]) == 0:
+            contigs.append(currContig)
+
+    return contigs
+
+
+
+    return
+
+
+# @param graph:
+# @param startN:
+# @param explored:
+# @param contigs:
+# @returns contigs:
+def dFSIterClasses(graph, startN):
+    explored = {}
+    stack = {startN: (startN.label, [])}
+    contigs = {}
+
+    while stack:
+        currN, contig = stack.popitem()
+        currContig = contig[0]
+
+        # get neighbors through Node class
+        for neighbor in graph[currN]:
+            info = contig[1].copy()
+            edge = graph[currN][neighbor].label
+            edgeInfo = graph[currN][neighbor].readIDs
+            if edge not in explored:
+                newContig = currContig + edge[-1]
+                info.append(edgeInfo)
+                stack[neighbor] = (newContig, info)
+                explored[edge] = True
+            else: newContig = currContig
+            # if current node is a leaf
+            if len(graph[neighbor]) == 0:
+                contigs[newContig] = info
+
+
+    return contigs
+
+
+
+    return
 
 
 # get nodes with no input edges to start traversal at
@@ -39,14 +113,10 @@ def depthFirstSearch(graph, currNode, contigs, explored, currContig, c):
 # @returns startNs: list of nodes with no input edges
 def getStartNodes(graph):
     startNs = []
-    count = 0
     for node in graph:
-        if count%1000 == 0:
-            print(count)
         exists = any(node in d.values() for d in graph.values())
         if not exists:
             startNs.append(node)
-        count+=1
     return startNs
 
 
@@ -66,7 +136,19 @@ def getLeaves(graph):
 def graphTraverse(graph,startNs):
     allContigs = []
     for start in startNs:
-        contigs = depthFirstSearch(graph, start, [], [], start, 0)
+        contigs = depthFirstSearch(graph, start, [], [], start)
         allContigs.extend(contigs)
+
+    return allContigs
+
+
+def graphTraverseIter(graph, startNs):
+    allContigs = {}
+    c = 0
+
+    for start in startNs:
+
+        contigs = dFSIterClasses(graph, start)
+        allContigs.update(contigs)
 
     return allContigs
