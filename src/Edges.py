@@ -1,6 +1,6 @@
 # Author: Katherina Cortes
 # Date: April 2, 2022
-# Purpose:
+# Purpose: edge class creation
 
 class Edge:
     def __init__(self, label, readID, start):

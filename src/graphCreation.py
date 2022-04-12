@@ -2,10 +2,11 @@
 # Date: March 3, 2022
 # Purpose: Make de bruijn graph with reads
 
-from Edges import Edge
-from Nodes import Node
+from src.Edges import Edge
+from src.Nodes import Node
 
-# make de bruijn graph nodes are of length fixLen and edges are the reads
+# make de bruijn graph edges are of length fixLen and edges are the reads
+# nodes are length fixLen-1
 # @param kmers: list of reads
 # @returns graph: dictionary
 def makeDeBruijnGraph(kmers, fixLen=10):
@@ -34,20 +35,25 @@ def makeDeBruijnGraph(kmers, fixLen=10):
 
 
 # make graph using edges and nodes classes
+# classes contain information about origin of reads
+# param reads: dictionary of kmers to be used as edges with read info
+# param nodes: dictionary of nodes
+# param fixLen: kmer length
+# returns graph: dictionary of created graph
+# returns startNs: dictionary of start nodes, nodes with no input edges
 def makeClassesDeBruijnGraph(reads, nodes, fixLen=10):
     graph = {}
     startNs = {}
     c = 0
     for m in reads:
-        edgeTemp = m
         node1 = m[:fixLen]
         node2 = m[-(fixLen):]
         nodeS = nodes[node1]
         nodeE = nodes[node2]
 
+        # create edges
         for readID in reads[m]:
             edge = Edge(m, readID, reads[m][readID])
-
         nodeS.addEdge(edge, nodeE)
 
         if nodeS not in graph:
@@ -56,18 +62,18 @@ def makeClassesDeBruijnGraph(reads, nodes, fixLen=10):
         else:
             graph[nodeS][nodeE] = edge
 
-
         if nodeE not in graph:
             graph[nodeE] = {}
         elif nodeE in startNs:
             del startNs[nodeE]
         c+=1
-
-
     return graph, startNs
 
 
-
+# makes edges of length kLen from reads
+# param reads: list of reads from file
+# param kLen: int of size of kmer
+# returns kmers: dictionary of kmers and number of times they appear
 def makeKmers(reads, kLen):
     kmers = {}
 
@@ -79,12 +85,14 @@ def makeKmers(reads, kLen):
                     kmers[read[r:r+kLen]] = 1
                 else:
                     kmers[read[r:r+kLen]] +=1
-
-
     return kmers
 
 
-# TODO make nodes here will be easier
+# makes edges of length kLen from reads
+# edges have info about origin of read
+# param reads: list of reads from file
+# param kLen: int of size of kmer
+# returns: dictionary of kmers and where kmer begins in read
 def makeInfoKmers(reads, kLen):
     kmers = {}
 
@@ -96,11 +104,16 @@ def makeInfoKmers(reads, kLen):
                     kmers[read[r:r+kLen]] = {reads[read]: r}
                 else:
                     kmers[read[r:r+kLen]][reads[read]] = r
-
-
     return kmers
 
 
+# makes edges and nodes
+# edges are of length kLen from reads
+# edges have info about origin of read
+# param reads: list of reads from file
+# param kLen: int of size of kmer
+# returns kmers: dictionary of kmers, read info and where kmer begins in read
+# returns nodes: dictionary of all nodes in graph
 def makeNodes(reads, kLen):
     kmers = {}
     nodes = {}
@@ -110,7 +123,7 @@ def makeNodes(reads, kLen):
             if r+kLen < len(read)+1:
                 kmer = read[r:r+kLen]
                 if kmer not in kmers:
-                    kmers[read[r:r+kLen]] = {reads[read]: r+kLen-1}
+                    kmers[read[r:r+kLen]] = {reads[read]: r+kLen}
                     label1 = read[r:r+kLen-1]
                     label2 = read[r+1:r+kLen]
                     if label1 not in nodes:
@@ -122,6 +135,6 @@ def makeNodes(reads, kLen):
                     else:
                         nodes[label2].isLeaf = False
                 else:
-                    kmers[read[r:r+kLen]][reads[read]] = r+kLen-1
+                    kmers[read[r:r+kLen]][reads[read]] = r+kLen
 
     return kmers, nodes

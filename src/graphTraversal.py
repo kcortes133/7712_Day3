@@ -11,7 +11,7 @@
 # @param currContig: current string contig being build
 # @param startNs: list of nodes to start traversal at, dont have input edges
 # @returns contigs: list of contigs made from graph
-from collections import deque
+import time
 
 
 def depthFirstSearch(graph, currNode, contigs, explored, currContig):
@@ -40,23 +40,22 @@ def depthFirstSearch(graph, currNode, contigs, explored, currContig):
     return contigs
 
 
-# @param graph:
-# @param startN:
-# @param explored:
-# @param contigs:
-# @returns contigs:
+# depth first search iteratively, not using classes
+# @param graph: dictionary of graph from reads
+# @param startN: dictionary of start nodes, nodes without incoming edges
+# @returns contigs: dictionary of contigs and read origin info
 def dFSIter(graph, startN):
     explored = {}
     stack = {startN: startN.label}
     contigs = []
 
     while stack:
-        print('-----------')
         currN, currContig = stack.popitem()
 
         # get neighbors through Node class
         for neighbor in graph[currN]:
             edge = graph[currN][neighbor].label
+
             if edge not in explored:
                 stack[neighbor] = currContig + edge[-1]
                 explored[edge] = True
@@ -67,15 +66,44 @@ def dFSIter(graph, startN):
     return contigs
 
 
+# depth first search iteratively and account for bubbles
+# @param graph: dictionary of graph from reads
+# @param startN: dictionary of start nodes, nodes without incoming edges
+# @returns contigs: dictionary of contigs and read origin info
+def dFSIterClassesAllPaths(graph, startN):
+    stack = {startN: {'contig':startN.label, 'explored': {}, 'info':[]}}
+    contigs = {}
 
-    return
+    while stack:
+        currN, traverseInfo = stack.popitem()
+        currContig = traverseInfo['contig']
+
+        # get neighbors through Node class
+        for neighbor in graph[currN]:
+            info = traverseInfo['info'].copy()
+            currExplored = traverseInfo['explored'].copy()
+            edge = graph[currN][neighbor].label
+            edgeInfo = graph[currN][neighbor].readIDs
+            if edge not in currExplored:
+                newContig = currContig + edge[-1]
+                info.append(edgeInfo)
+                currExplored[edge] = True
+                stack[neighbor] = {}
+                stack[neighbor]['contig'] = newContig
+                stack[neighbor]['info'] = info.copy()
+                stack[neighbor]['explored'] = currExplored.copy()
+            else: newContig = currContig
+            # if current node is a leaf
+            if len(graph[neighbor]) == 0:
+                contigs[newContig] = info
+
+    return contigs
 
 
-# @param graph:
-# @param startN:
-# @param explored:
-# @param contigs:
-# @returns contigs:
+# depth first search iteratively only traverse each edge once
+# @param graph: dictionary of graph from reads
+# @param startN: dictionary of start nodes, nodes without incoming edges
+# @returns contigs: dictionary of contigs and read origin info
 def dFSIterClasses(graph, startN):
     explored = {}
     stack = {startN: (startN.label, [])}
@@ -100,12 +128,7 @@ def dFSIterClasses(graph, startN):
             if len(graph[neighbor]) == 0:
                 contigs[newContig] = info
 
-
     return contigs
-
-
-
-    return
 
 
 # get nodes with no input edges to start traversal at
@@ -120,6 +143,9 @@ def getStartNodes(graph):
     return startNs
 
 
+# get nodes without outgoing edges
+# param graph: dictionary of graph
+# returns ls: list of leaves
 def getLeaves(graph):
     ls = []
     for node in graph:
@@ -128,12 +154,11 @@ def getLeaves(graph):
     return ls
 
 
-
-
-# gets start nodes and traverses graph
+# given start nodes, traverses graph and gives all contigs
 # @param graph: dictionary of reads
-# @returns contigs: list of contigs generated from graph traversal
-def graphTraverse(graph,startNs):
+# @param startNs: list of start nodes
+# @returns allContigs: list of contigs generated from graph traversal
+def graphTraverse(graph, startNs):
     allContigs = []
     for start in startNs:
         contigs = depthFirstSearch(graph, start, [], [], start)
@@ -142,13 +167,21 @@ def graphTraverse(graph,startNs):
     return allContigs
 
 
+# given start nodes, traverses graph and gives all contigs
+# @param graph: dictionary of reads
+# @param startNs: list of start nodes
+# @returns allContigs: dictionary of contigs generated from graph traversal with read info
 def graphTraverseIter(graph, startNs):
     allContigs = {}
-    c = 0
 
+    print(len(startNs))
+    c =0
+    s = time.time()
     for start in startNs:
-
         contigs = dFSIterClasses(graph, start)
         allContigs.update(contigs)
+        print(c)
+        print(time.time()-s)
+        c+=1
 
     return allContigs

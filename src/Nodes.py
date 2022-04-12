@@ -1,6 +1,6 @@
 # Author: Katherina Cortes
 # Date: April 2, 2022
-# Purpose:
+# Purpose: node class creation
 
 
 class Node:

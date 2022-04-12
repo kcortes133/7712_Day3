@@ -1,4 +1,4 @@
-# Reassembling the Genome
+# Reassembling the Genome and Sequence Query 
 
 ## Goal
 Assemble contigs from next-generation sequencing reads and return the largest contig that contains
@@ -12,7 +12,12 @@ assembled contigs.
 A de bruijn graph is constructed from the reads file where nodes are of kmer defined length and
 the edges are the reads. Once constructed, a depth first search algorithm is run to get all possible
 contigs starting from nodes with no input edges and iterating over all edges. Contigs are assembled 
-while traversing the graph and returned as a library to search for the query through.
+while traversing the graph and returned as a library to search for the query through.Library is searched for query, 
+option for error allowance in string matching. 
+
+Output is two files, a fasta file and a tab delimited file. The fasta file contains the longest contig query was 
+found in and contig name. The tab delimited file contains information about where in the contig the query was found
+and information about the original read the query can be found in. 
 
 ## Install
 - matplotlib.pyplot
@@ -21,37 +26,73 @@ while traversing the graph and returned as a library to search for the query thr
 
 ## Usage
 #### Python Usage
+
 ```python
 
-import dataExploration, graphTraversal, graphCreation, querySearch
+from src import graphCreation, graphTraversal, dataExploration, querySearch, outputFile
+
 
 def main():
-   readsFile = 'READS.fasta'
-   queryFile = 'Query.fasta'
    # get reads from file and determine spread
-   chroms = dataExploration.getReadsChrom(readsFile)
+   readsFile = 'READS.fasta'
+   queryFile = 'QUERY.fasta'
+   kmerSize = 25
+   allowedError =0
+   topContigs = 1
+   
+   chroms = dataExploration.getReadsChromInfo(readsFile)
    query = dataExploration.getQuery(queryFile)
-
-   allContigs = []
    # get reads, make graph, get contigs for all chromosomes
+   output = []
+   topContigs = {}
+
    for c in chroms:
+      reads, nodes = graphCreation.makeNodes(chroms[c], kmerSize)
+
       print('Number of reads on ', c, len(chroms[c]))
-      
-      # Histogram of read lengths
-      dataExploration.plotHist(chroms[c], c+ ' Read Lengths')
-      
-      g, startNs = graphCreation.makeDeBruijnGraph(chroms[c])
-      print('Number of start nodes: ', len(startNs))
-      
-      contigs = graphTraversal.graphTraverse(g,startNs)
-      
-      # Histogram of contig lengths created from graph traversal
-      dataExploration.plotHist(contigs, c+ ' Contig Lengths')
-      print('Number of contigs', c, len(contigs))
+      dataExploration.plotHist(chroms[c], c + ' Read Lengths', 'Reads')
 
-   querySearch.searchQuery(query, contigs)
+      g, startNs = graphCreation.makeClassesDeBruijnGraph(reads, nodes, kmerSize - 1)
+      contigs = graphTraversal.graphTraverseIter(g, startNs)
 
+      print('Number of contigs on ', c, len(contigs))
+      dataExploration.plotHist(list(contigs.keys()), c + ' Contig Lengths', 'Contigs')
+
+      num = 0
+      for q in query:
+         # matchID  contigID  readStart readEnd  matchStart matchEnd
+         matches = querySearch.querySearch(query[q], contigs, allowedError, kmerSize, topContigs)
+         revMatches = querySearch.querySearch(query[q][::-1], contigs, allowedError, kmerSize, topContigs)
+
+         # sort matches by length of key
+         matches = sorted(list(matches.items()), key=lambda key:len(key[0]), reverse=True)
+         revMatches = sorted(list(revMatches.items()), key=lambda key:len(key[0]), reverse=True)
+
+         revTopMatches = revMatches[0:topContigs]
+         topMatches = matches[0:topContigs]
+
+         # get info for matches
+         for m in topMatches:
+            contigID = 'contig'+ str(num+1)
+            topContigs[contigID] = m[0]
+            matchInfo = m[1][0], contigID, str(m[1][1]), str(m[1][1]+len(query[q])), str(m[1][2]), str(m[1][2]+len(query[q]))
+            output.append(matchInfo)
+            num+=1
+
+         # get reverse matches info
+         for m in revTopMatches:
+            contigID = 'contig'+ str(num+1)
+            topContigs[contigID] = m[0]
+            matchInfo = m[1][0], contigID, str(m[1][1]), str(m[1][1]-len(query[q])), str(m[1][2]), str(m[1][2]-len(query[q]))
+            output.append(matchInfo)
+            num+=1
+
+
+   # write to output Files
+   outputFile.outputQueryInfo(output, outFile)
+   outputFile.outputContigs(topContigs, outFasta)
    return
+
 
 
 main()
@@ -77,7 +118,7 @@ $ python .\main.py READS.fasta QUERY.fasta --kmerSize=10
    - each two lines give information about query and query
 
 ## Output
-General Info about reads, start nodes and contigs
+#### General Info about reads, start nodes and contigs
 - Number of reads on  2S43D 62278
 - Number of start nodes:  48052
 - Number of contigs 2S43D 58199
@@ -93,5 +134,24 @@ General Info about reads, start nodes and contigs
 ![chrom2 read lengths](https://user-images.githubusercontent.com/22487858/156932749-3f5a0a8b-9699-46b3-a75f-e9221a390edd.png)
 
 ![chrom 2 contig lengths](https://user-images.githubusercontent.com/22487858/156932755-295e6669-66e2-45ee-bea7-8b8da10a2b82.png)
+
+####Files
+
+ALLELES.fasta
+- fasta file
+- each two lines gives information about longest contig containing query and contig
+
+ALLELES.aln
+- tab delimited file
+- describes alignment of query to longest contig
+- sseqid   qseqid  sstart  send  qstart  qend
+- sseqid : name of sequence read
+- qseqid : name of contig 
+- sstart : start coord of query in sequence read
+- send : end coord of query in sequence read
+- qstart : start coord of query in contig
+- qend: end coord of query in contig
+
+
 
 

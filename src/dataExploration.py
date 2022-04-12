@@ -4,7 +4,6 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 
 # get read lengths from input file
 # @params readF: input file name
@@ -117,7 +116,7 @@ def getReadsChromInfo(readF):
 # @param strings: list of strings
 # @param title: title for histogram
 # @displays: histogram of string lengths
-def plotHist(strings, title):
+def plotHist(strings, title, type):
     slen = []
     for s in strings:
         slen.append(len(s))
@@ -126,5 +125,7 @@ def plotHist(strings, title):
     print(np.mean(slen))
     plt.hist(slen, rwidth=0.9)
     plt.title(title)
+    plt.xlabel('Length of ' + type)
+    plt.ylabel('Number of ' + type)
     plt.show()
 
